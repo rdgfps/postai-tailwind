@@ -1,3 +1,4 @@
+// App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './components/Login.jsx';
@@ -15,15 +16,14 @@ import EmailEnviado from './components/EmailEnviado.jsx';
 import NovaSenha from './components/NovaSenha.jsx';
 import Suporte from './components/Suporte.jsx';
 import CalendarioPosts from './components/CalendarioPosts.jsx';
-import './App.css'; 
 
 const Layout = ({ children }) => {
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
-      <div className="flex-1 p-6 ml-0">
+      <main className="flex-1 p-6">
         {children}
-      </div>
+      </main>
     </div>
   );
 };
@@ -31,7 +31,7 @@ const Layout = ({ children }) => {
 function App() {
   return (
     <Router>
-      <div className="app-container">
+      <div className="App">
         <Routes>
           <Route path="/" element={<Login />} />      
           <Route path="/register" element={<Register />} />
