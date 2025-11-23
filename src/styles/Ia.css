@@ -1,0 +1,86 @@
+.ia-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--cor-fundo);
+  padding: 20px;
+}
+
+.ia-card {
+  background-color: var(--cor-card-fundo);
+  padding: 40px 30px;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+.ia-icon {
+  font-size: 4rem;
+  color: var(--cor-botoes-laranja);
+  margin-bottom: 20px;
+}
+
+.ia-card h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  color: var(--cor-texto);
+}
+
+.ia-card p {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.ia-subtext {
+  font-style: italic;
+  color: #999;
+  margin-bottom: 25px;
+}
+
+.ia-btn {
+  display: inline-block;
+  background-color: var(--cor-botoes-laranja);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.ia-btn:hover {
+  background-color: #e67e22;
+  transform: translateY(-2px);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsivo */
+@media (max-width: 480px) {
+  .ia-card {
+    padding: 30px 20px;
+  }
+
+  .ia-icon {
+    font-size: 3rem;
+  }
+
+  .ia-card h1 {
+    font-size: 1.6rem;
+  }
+}

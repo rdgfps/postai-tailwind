@@ -1,0 +1,122 @@
+
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0047FF 0%, #001F54 50%, #003DD6 100%);
+  padding: 20px;
+}
+
+/* --- Card de Registro (Novo) --- */
+.register-card {
+background-color: rgba(255, 255, 255, 0.95);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15); 
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  transition: transform 0.3s ease-out;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.register-header {
+  margin-bottom: 30px;
+}
+
+.register-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+  color: var(--cor-texto);
+}
+
+.register-header p {
+  font-size: 0.95rem;
+}
+
+/* --- Formulário e Inputs --- */
+.register-form {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+}
+
+.register-form input {
+  padding: 14px 18px;
+  margin-bottom: auto;
+  margin-top: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  color: black;
+}
+
+.register-form input:focus {
+  border-color: var(--cor-principal);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2); 
+}
+
+.register-form ::placeholder {
+  color: black;
+}
+/* --- Botão Principal (Registrar - Laranja) --- */
+.btn-register-primary {
+  padding: 15px;
+  background-color: var(--cor-botoes-laranja); 
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.1s;
+  margin-top: 5px;
+  margin-bottom: 10px; /* Adiciona espaço para o botão Voltar */
+}
+
+.btn-register-primary:hover {
+  background-color: #e67e22; /* Laranja mais escuro */
+}
+
+.btn-register-primary:active {
+  transform: scale(0.99);
+}
+
+.btn-register-secondary {
+  padding: 15px;
+  background-color: var(--cor-card-fundo);
+  color: var(--cor-principal);
+  border: 2px solid var(--cor-principal);
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-register-secondary:hover {
+  background-color: var(--cor-principal);
+  color: white;
+}
+
+
+@media (max-width: 480px) {
+  .register-card {
+    padding: 30px 20px;
+    box-shadow: none; 
+    border-radius: 5px;
+    height: 80%;
+    width: 80%;
+  }
+  .register-container {
+    padding: 0;
+     background: linear-gradient(180deg, #0047FF 0%, #001F54 50%, #003DD6 100%);
+     background-size: 100% 100%;
+  }
+}

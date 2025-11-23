@@ -1,0 +1,128 @@
+.editarperfil-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #f9fafc;
+  padding: 20px;
+}
+
+.editarperfil-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 25px;
+  width: 420px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+
+.editarperfil-card h1 {
+  font-size: 22px;
+  text-align: center;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #444;
+  margin-top: 5px;
+}
+
+.input {
+    color: black;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  outline: none;
+  transition: border 0.2s ease;
+    color: black;
+}
+
+input:focus,
+textarea:focus {
+  border-color: black;
+}
+
+.bio-box {
+  height: 70px;
+  resize: none;
+}
+
+.stats-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.stats-row input {
+  width: 100%;
+}
+
+.foto-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.foto-preview {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 5px;
+  border: 2px solid #ddd;
+}
+
+.foto-placeholder {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #eee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  font-size: 12px;
+}
+
+.btn-primary {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 15px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.btn-primary:hover {
+  background-color: #43a047;
+}
+
+.btn-secondary {
+  text-align: center;
+  display: block;
+  color: #666;
+  text-decoration: none;
+  margin-top: 6px;
+  font-size: 14px;
+}
+
+.editarperfil-card input,
+.editarperfil-card textarea {
+  color: #000 !important;
+  background-color: #fff !important;
+}

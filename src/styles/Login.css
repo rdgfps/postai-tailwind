@@ -1,0 +1,176 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0047FF 0%, #001F54 50%, #003DD6 100%);
+  padding: 20px;
+}
+
+.login-card {
+  background-color: var(--cor-card-fundo);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  transition: transform 0.3s ease-out;
+}
+
+.login-header {
+  margin-bottom: 30px;
+}
+
+.logo-icon-big img {
+  display: block;
+  margin: 0 auto 25px;
+  max-width: 150px;
+  height: auto;
+}
+
+.login-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+  color: var(--cor-texto);
+}
+
+.login-header p {
+  color: #777;
+  font-size: 0.95rem;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-form input {
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  color: black;
+}
+
+.login-form input:focus {
+  border-color: var(--cor-principal);
+  box-shadow: 0 0 0 3px rgba(var(--cor-principal-rgb, 52, 152, 219), 0.2);
+  outline: none;
+}
+
+.login-form ::placeholder {
+  color: black;
+}
+
+.login-button {
+  padding: 15px;
+  background-color: var(--cor-botoes-laranja);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.1s;
+  margin-top: 5px;
+  display: block;
+  text-decoration: none;
+}
+
+.login-button:hover {
+  background-color: #e67e22;
+}
+
+.login-button:active {
+  transform: scale(0.99);
+}
+
+.login-separator {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 25px 0;
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+.login-separator::before,
+.login-separator::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.login-separator:not(:empty)::before {
+  margin-right: .5em;
+}
+
+.login-separator:not(:empty)::after {
+  margin-left: .5em;
+}
+
+.register-button {
+  display: block;
+  padding: 15px;
+  background-color: var(--cor-card-fundo);
+  color: var(--cor-principal);
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  border: 2px solid var(--cor-principal);
+  margin-bottom: 25px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.register-button:hover {
+  background-color: var(--cor-principal);
+  color: white;
+}
+
+.social-login {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.social-button {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  width: 65px;
+  height: 65px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  padding: 0;
+}
+
+.social-button:hover {
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+}
+
+.social-icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 30px 20px;
+    box-shadow: none;
+    border-radius: 5px;
+  }
+}
