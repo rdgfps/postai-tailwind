@@ -80,7 +80,7 @@ const Sidebar = () => {
           >
             P
           </div>
-          <span className="logo-text text-2xl font-bold text-orange-500">PostAí</span>
+          <span className="logo-text text-2xl font-bold text-blue-900">PostAí</span>
         </div>
 
         <div className="nav-links flex-1">

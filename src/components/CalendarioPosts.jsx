@@ -1,43 +1,79 @@
-import React, { useState, useEffect } from "react";
-import "../styles/CalendarioPosts.css";
-import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import React, { useState } from "react";
+import { 
+  AiOutlinePlus, 
+  AiOutlineLeft, 
+  AiOutlineRight 
+} from "react-icons/ai";
 
-const anos = [2024, 2025, 2026, 2027];
 const meses = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
   "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
 ];
 
-  const CalendarioPosts = () => {
-    const [indiceMes, setIndiceMes] = useState(new Date().getMonth());
+const anosDisponiveis = [2024, 2025, 2026, 2027];
+
+const CalendarioPosts = () => {
+  const [indiceMes, setIndiceMes] = useState(new Date().getMonth());
   const [indiceAno, setIndiceAno] = useState(new Date().getFullYear());
 
   const mudarMes = (direcao) => {
     setIndiceMes((atual) => {
       let novoMes = atual + (direcao === "proximo" ? 1 : -1);
+      let novoAno = indiceAno;
+
       if (novoMes > 11) {
+        // Avançou para o próximo ano
         novoMes = 0;
-        setIndiceAno((ano) => ano + 1);
+        novoAno = getProximoAno(novoAno);
       } else if (novoMes < 0) {
+        // Voltou para o ano anterior
         novoMes = 11;
-        setIndiceAno((ano) => ano - 1);
+        novoAno = getAnoAnterior(novoAno);
       }
+
+      // Atualiza o ano se necessário
+      if (novoAno !== indiceAno) {
+        setIndiceAno(novoAno);
+      }
+
       return novoMes;
     });
   };
 
-  const mudarAno = (direcao) => {
-    setIndiceAno((atual) => atual + (direcao === "proximo" ? 1 : -1));
+  const getProximoAno = (anoAtual) => {
+    const anoIndex = anosDisponiveis.indexOf(anoAtual);
+    if (anoIndex === -1 || anoIndex === anosDisponiveis.length - 1) {
+      // Se não encontrou o ano ou é o último, volta para o primeiro
+      return anosDisponiveis[0];
+    }
+    return anosDisponiveis[anoIndex + 1];
   };
 
-  const mesAtual = meses[indiceMes];
-  const anoAtual = indiceAno;
+  const getAnoAnterior = (anoAtual) => {
+    const anoIndex = anosDisponiveis.indexOf(anoAtual);
+    if (anoIndex === -1 || anoIndex === 0) {
+      // Se não encontrou o ano ou é o primeiro, vai para o último
+      return anosDisponiveis[anosDisponiveis.length - 1];
+    }
+    return anosDisponiveis[anoIndex - 1];
+  };
+
+  const mudarAno = (direcao) => {
+    setIndiceAno((atual) => {
+      if (direcao === "proximo") {
+        return getProximoAno(atual);
+      } else {
+        return getAnoAnterior(atual);
+      }
+    });
+  };
 
   const getDiasDoMes = (ano, mes) => {
     const data = new Date(ano, mes, 1);
     const diasNoMes = new Date(ano, mes + 1, 0).getDate();
     const diasDaSemanaInicio = data.getDay();
     const dias = [];
+    
     for (let i = 0; i < diasDaSemanaInicio; i++) {
       dias.push(null);
     }
@@ -49,63 +85,131 @@ const meses = [
     return dias;
   };
 
-  const diasDoMesAtual = getDiasDoMes(anoAtual, indiceMes);
+  const diasDoMesAtual = getDiasDoMes(indiceAno, indiceMes);
 
   return (
-    <div className="calendario-container">
-      <div className="calendario-header">
-        <h2>Calendário de Posts</h2>
-        <button className="btn-novo-post">
-          <Plus size={18} />
-          <a href="/criar-post">Criar Novo Post</a>
-        </button>
-      </div>
-
-      <div className="calendario-controles">
-        <button className="seta" onClick={() => mudarMes("anterior")}>
-          <ChevronLeft size={18} />
-        </button>
-        <h3>{mesAtual} {anoAtual}</h3>
-        <button className="seta" onClick={() => mudarMes("proximo")}>
-          <ChevronRight size={18} />
-        </button>
-      </div>
-
-      <div className="filtros">
-        <button className="ativo">Todos</button>
-        <button>Instagram</button>
-        <button>Facebook</button>
-        <button>Twitter</button>
-        <button>LinkedIn</button>
-      </div>
-
-      <div className="grade-calendario">
-        {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((dia) => (
-          <div key={dia} className="dia-titulo">
-            {dia}
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="bg-white rounded-2xl shadow-sm p-10 flex flex-col gap-6">
+          {/* Header */}
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold text-gray-900">Calendário de Posts</h2>
           </div>
-        ))}
 
-        {diasDoMesAtual.map((dia, i) => (
-          <div key={i} className={`dia-card ${dia === null ? "empty" : ""}`}>
-            {dia && <span className="numero-dia">{dia}</span>}
-            {dia === 1 && <span className="post-dot instagram"></span>}
-            {dia === 3 && <span className="post-dot facebook"></span>}
-            {dia === 10 && <span className="post-dot agendado"></span>}
+          {/* Controles do Calendário */}
+          <div className="flex justify-center items-center gap-3">
+            <button 
+              className="border-none bg-white rounded-lg p-2 cursor-pointer shadow-sm transition-all duration-200 hover:bg-orange-500 hover:text-white"
+              onClick={() => mudarMes("anterior")}
+            >
+              <AiOutlineLeft size={18} />
+            </button>
+            
+            <div className="flex items-center gap-3">
+              <button 
+                className="border-none bg-white rounded-lg p-1 cursor-pointer shadow-sm transition-all duration-200 hover:bg-orange-500 hover:text-white text-sm"
+                onClick={() => mudarAno("anterior")}
+              >
+                <AiOutlineLeft size={14} />
+              </button>
+              
+              <h3 className="text-xl font-semibold text-gray-800">
+                {meses[indiceMes]} {indiceAno}
+              </h3>
+              
+              <button 
+                className="border-none bg-white rounded-lg p-1 cursor-pointer shadow-sm transition-all duration-200 hover:bg-orange-500 hover:text-white text-sm"
+                onClick={() => mudarAno("proximo")}
+              >
+                <AiOutlineRight size={14} />
+              </button>
+            </div>
+
+            <button 
+              className="border-none bg-white rounded-lg p-2 cursor-pointer shadow-sm transition-all duration-200 hover:bg-orange-500 hover:text-white"
+              onClick={() => mudarMes("proximo")}
+            >
+              <AiOutlineRight size={18} />
+            </button>
           </div>
-        ))}
-      </div>
 
-      <div className="legenda-container">
-        <h4>Legenda</h4>
-        <div className="legenda">
-          <span className="dot instagram"></span> Instagram
-          <span className="dot facebook"></span> Facebook
-          <span className="dot twitter"></span> Twitter
-          <span className="dot linkedin"></span> LinkedIn
-          <span className="dot agendado"></span> Agendado
-          <span className="dot publicado"></span> Publicado
-          <span className="dot rascunho"></span> Rascunho
+          {/* Indicador de anos disponíveis */}
+          <div className="text-center text-sm text-gray-600">
+            Anos disponíveis: {anosDisponiveis.join(", ")}
+          </div>
+
+          {/* Filtros */}
+          <div className="flex justify-center gap-2.5 flex-wrap">
+            <button className="bg-orange-500 text-white border border-orange-500 rounded-lg py-1.5 px-3 cursor-pointer font-medium transition-all duration-200">
+              Todos
+            </button>
+            <button className="bg-white border border-gray-300 rounded-lg py-1.5 px-3 cursor-pointer font-medium transition-all duration-200 hover:border-orange-500 hover:text-orange-500">
+              Instagram
+            </button>
+            <button className="bg-white border border-gray-300 rounded-lg py-1.5 px-3 cursor-pointer font-medium transition-all duration-200 hover:border-orange-500 hover:text-orange-500">
+              Facebook
+            </button>
+            <button className="bg-white border border-gray-300 rounded-lg py-1.5 px-3 cursor-pointer font-medium transition-all duration-200 hover:border-orange-500 hover:text-orange-500">
+              Twitter
+            </button>
+            <button className="bg-white border border-gray-300 rounded-lg py-1.5 px-3 cursor-pointer font-medium transition-all duration-200 hover:border-orange-500 hover:text-orange-500">
+              LinkedIn
+            </button>
+          </div>
+
+          {/* Grade do Calendário */}
+          <div className="grid grid-cols-7 gap-4 bg-white p-6 rounded-xl shadow-sm">
+            {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((dia) => (
+              <div key={dia} className="text-center font-semibold text-gray-700 text-sm pb-2">
+                {dia}
+              </div>
+            ))}
+
+            {diasDoMesAtual.map((dia, index) => (
+              <div 
+                key={`${indiceAno}-${indiceMes}-${dia || `empty-${index}`}`}
+                className={`bg-gray-50 rounded-xl p-4 h-24 relative transition-all duration-200 hover:bg-white hover:shadow-md ${
+                  dia === null ? "invisible" : ""
+                }`}
+              >
+                {dia && <span className="font-bold text-gray-900">{dia}</span>}
+                {dia === 1 && <span className="w-2 h-2 rounded-full bg-pink-600 absolute bottom-2.5 left-2.5"></span>}
+                {dia === 3 && <span className="w-2 h-2 rounded-full bg-blue-600 absolute bottom-2.5 left-2.5"></span>}
+                {dia === 10 && <span className="w-2 h-2 rounded-full bg-green-500 absolute bottom-2.5 left-2.5"></span>}
+              </div>
+            ))}
+          </div>
+
+          {/* Legenda */}
+          <div className="bg-white rounded-xl p-5 shadow-sm">
+            <h4 className="mb-2.5 text-gray-900 font-semibold">Legenda</h4>
+            <div className="flex flex-wrap gap-4 text-sm text-gray-700">
+              <span className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-pink-600 inline-block"></span>
+                Instagram
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block"></span>
+                Facebook
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-blue-400 inline-block"></span>
+                Twitter
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-blue-700 inline-block"></span>
+                LinkedIn
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-green-500 inline-block"></span>
+                Agendado
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>
+                Publicado
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

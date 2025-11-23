@@ -1,6 +1,6 @@
-// components/Dashboard.jsx
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { postService } from './PostService';
 
 const HomeIcon = () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>;
 const ChartIcon = () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>;
@@ -32,374 +32,343 @@ const MobileNav = ({ location }) => {
   );
 };
 
-const StatCard = ({ value, label, className = "" }) => (
-  <div className={`text-center p-5 bg-white rounded-xl shadow-sm hover:shadow-md transition transform hover:-translate-y-1 ${className}`}>
-    <p className="text-3xl font-bold text-orange-500">{value}</p>
-    <p className="text-gray-500 text-sm font-medium">{label}</p>
-  </div>
-);
-
 const Dashboard = () => {
   const location = useLocation();
   const navigate = useNavigate();
-
-  const [perfil, setPerfil] = useState({ 
-    nome: "", 
-    foto: "",
-    email: ""
+  const [usuario, setUsuario] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [estatisticas, setEstatisticas] = useState({
+    total: 0,
+    publicados: 0,
+    agendados: 0,
+    rascunhos: 0
   });
-  const [postsAgendados, setPostsAgendados] = useState(0);
-  const [postsPublicados, setPostsPublicados] = useState(0);
-  const [engajamento, setEngajamento] = useState("0");
-  const [alcance, setAlcance] = useState("0");
-  const [atividadesRecentes, setAtividadesRecentes] = useState([]);
-  const [proximosAgendamentos, setProximosAgendamentos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
-  // Verificar se usuário está logado
-  useEffect(() => {
+  // Verificar posts agendados e atualizar estatísticas
+  const atualizarEstatisticas = async () => {
     const usuarioLogado = localStorage.getItem("usuarioLogado");
-    if (!usuarioLogado) {
-      navigate("/");
-      return;
+    if (usuarioLogado) {
+      const userData = JSON.parse(usuarioLogado);
+      // Verificar se o userId é válido
+      if (userData.id && userData.id !== "null" && userData.id !== "undefined") {
+        const stats = await postService.buscarEstatisticas(userData.id);
+        setEstatisticas(stats);
+      }
     }
+  };
 
-    const userData = JSON.parse(usuarioLogado);
-    setPerfil({
-      nome: userData.nome || "",
-      foto: userData.foto || "",
-      email: userData.email || ""
-    });
-  }, [navigate]);
+  const carregarPosts = async () => {
+    try {
+      const usuarioLogado = localStorage.getItem("usuarioLogado");
+      if (usuarioLogado) {
+        const userData = JSON.parse(usuarioLogado);
+        
+        // Verificar se o userId é válido
+        if (!userData.id || userData.id === "null" || userData.id === "undefined") {
+          console.error("ID de usuário inválido no localStorage");
+          return;
+        }
+
+        setUsuario(userData);
+
+        const response = await fetch("http://localhost:3001/posts");
+        if (!response.ok) {
+          throw new Error("Erro ao carregar posts");
+        }
+
+        const todosPosts = await response.json();
+        
+        const postsDoUsuario = todosPosts.filter(
+          (post) => post.usuarioId && post.usuarioId.toString() === userData.id.toString()
+        );
+        
+        // Ordenar posts por data (mais recentes primeiro)
+        const postsOrdenados = postsDoUsuario.sort((a, b) => 
+          new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        
+        setPosts(postsOrdenados.slice(0, 5)); // Mostrar apenas os 5 mais recentes
+        await atualizarEstatisticas();
+      }
+    } catch (error) {
+      console.error("Erro ao carregar posts:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      const usuarioLogado = localStorage.getItem("usuarioLogado");
-      if (!usuarioLogado) return;
+    // Verificar posts agendados quando o dashboard carregar
+    postService.verificarEPublicarPostsAgendados().then(() => {
+      carregarPosts();
+    });
 
-      try {
-        setLoading(true);
-        setError("");
-        
-        const userData = JSON.parse(usuarioLogado);
-        const userId = userData.id;
+    // Atualizar estatísticas periodicamente
+    const interval = setInterval(() => {
+      postService.verificarEPublicarPostsAgendados().then(() => {
+        carregarPosts();
+      });
+    }, 30000); // A cada 30 segundos
 
-        console.log("Buscando dados para usuário ID:", userId);
-
-        // Buscar dados do usuário, posts e estatísticas
-        const [userRes, postsRes, statsRes] = await Promise.allSettled([
-          fetch(`http://localhost:3001/usuarios/${userId}`),
-          fetch(`http://localhost:3001/posts?usuarioId=${userId}`),
-          fetch(`http://localhost:3001/estatisticas?usuarioId=${userId}`)
-        ]);
-
-        let userDataFromApi = userData;
-        let postsData = [];
-        let statsData = [];
-
-        // Processar resposta do usuário
-        if (userRes.status === 'fulfilled' && userRes.value.ok) {
-          userDataFromApi = await userRes.value.json();
-          console.log("Dados do usuário:", userDataFromApi);
-        }
-
-        // Processar resposta dos posts
-        if (postsRes.status === 'fulfilled' && postsRes.value.ok) {
-          const postsResponse = await postsRes.value.json();
-          console.log("Resposta posts:", postsResponse);
-          
-          // Se for um array, usar diretamente
-          if (Array.isArray(postsResponse)) {
-            postsData = postsResponse;
-          } else {
-            // Se for um objeto, tentar extrair posts
-            postsData = postsResponse.posts || postsResponse.data || [];
-          }
-        }
-
-        // Processar resposta das estatísticas
-        if (statsRes.status === 'fulfilled' && statsRes.value.ok) {
-          const statsResponse = await statsRes.value.json();
-          console.log("Resposta estatísticas:", statsResponse);
-          
-          if (Array.isArray(statsResponse)) {
-            statsData = statsResponse;
-          } else {
-            statsData = [statsResponse];
-          }
-        }
-
-        // Atualizar perfil
-        setPerfil(prev => ({
-          ...prev,
-          nome: userDataFromApi.nome || prev.nome,
-          foto: userDataFromApi.foto || prev.foto,
-          email: userDataFromApi.email || prev.email
-        }));
-
-        // Calcular posts agendados e publicados
-        const agendados = postsData.filter((p) => p.status === "agendado" || p.agendado).length;
-        const publicados = postsData.filter((p) => p.status === "publicado" || p.publicado).length;
-
-        console.log("Posts agendados:", agendados, "Posts publicados:", publicados);
-
-        setPostsAgendados(agendados);
-        setPostsPublicados(publicados);
-
-        // Usar estatísticas ou valores padrão
-        const estatisticas = statsData[0] || {};
-        console.log("Estatísticas encontradas:", estatisticas);
-
-        setEngajamento(estatisticas.engajamento || "1.2K");
-        setAlcance(estatisticas.alcance || "15.7K");
-
-        // Processar atividades recentes (últimos 5 posts)
-        const atividades = postsData
-          .sort((a, b) => new Date(b.data || b.createdAt) - new Date(a.data || a.createdAt))
-          .slice(0, 5)
-          .map(post => ({
-            id: post.id,
-            titulo: post.titulo || post.conteudo?.substring(0, 30) + '...' || 'Post sem título',
-            plataforma: post.plataforma || 'Instagram',
-            status: post.status || 'rascunho',
-            data: post.data || post.createdAt
-          }));
-
-        setAtividadesRecentes(atividades);
-
-        // Processar próximos agendamentos (posts agendados para o futuro)
-        const hoje = new Date();
-        const agendamentos = postsData
-          .filter(post => post.status === 'agendado' && new Date(post.data) > hoje)
-          .sort((a, b) => new Date(a.data) - new Date(b.data))
-          .slice(0, 5)
-          .map(post => ({
-            id: post.id,
-            data: post.data,
-            titulo: post.titulo || post.conteudo?.substring(0, 30) + '...' || 'Post agendado',
-            plataforma: post.plataforma || 'Twitter',
-            status: 'agendado'
-          }));
-
-        setProximosAgendamentos(agendamentos);
-
-      } catch (error) {
-        console.error("Erro ao buscar dados da API:", error);
-        setError("Não foi possível carregar os dados completos. Usando dados de exemplo.");
-        
-        // Usar dados básicos do localStorage
-        const usuarioLogado = localStorage.getItem("usuarioLogado");
-        if (usuarioLogado) {
-          const userData = JSON.parse(usuarioLogado);
-          setPerfil({
-            nome: userData.nome || "Usuário",
-            foto: userData.foto || "",
-            email: userData.email || ""
-          });
-        }
-        // Valores padrão para demonstração
-        setPostsAgendados(1);
-        setPostsPublicados(2);
-        setEngajamento("1.2K");
-        setAlcance("15.7K");
-        
-        // Dados de exemplo para atividades
-        setAtividadesRecentes([
-          { id: 1, titulo: "Post no Instagram", plataforma: "Instagram", status: "publicado", data: "2024-01-15" },
-          { id: 2, titulo: "Story no Facebook", plataforma: "Facebook", status: "agendado", data: "2024-01-20" },
-          { id: 3, titulo: "Tweet no Twitter", plataforma: "Twitter", status: "rascunho", data: "2024-01-18" }
-        ]);
-
-        setProximosAgendamentos([
-          { id: 2, data: "2024-01-20T10:00:00", titulo: "Twitter Post", plataforma: "Twitter", status: "agendado" },
-          { id: 4, data: "2024-01-19T15:30:00", titulo: "LinkedIn Article", plataforma: "LinkedIn", status: "agendado" }
-        ]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserData();
+    return () => clearInterval(interval);
   }, []);
 
   const formatarData = (dataString) => {
-    const data = new Date(dataString);
-    const hoje = new Date();
-    const amanha = new Date(hoje);
-    amanha.setDate(hoje.getDate() + 1);
-
-    if (data.toDateString() === hoje.toDateString()) {
-      return `Hoje, ${data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
-    } else if (data.toDateString() === amanha.toDateString()) {
-      return `Amanhã, ${data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
-    } else {
-      return data.toLocaleDateString('pt-BR', { 
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
+    try {
+      const data = new Date(dataString);
+      return data.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
         hour: '2-digit',
         minute: '2-digit'
       });
+    } catch (error) {
+      return "Data inválida";
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'publicado':
-        return 'text-green-600 bg-green-100';
-      case 'agendado':
-        return 'text-blue-600 bg-blue-100';
-      case 'rascunho':
-        return 'text-gray-600 bg-gray-100';
-      default:
-        return 'text-gray-600 bg-gray-100';
-    }
+  const getStatusBadge = (status) => {
+    const config = {
+      publicado: { cor: 'bg-green-100 text-green-800', texto: 'Publicado' },
+      agendado: { cor: 'bg-blue-100 text-blue-800', texto: 'Agendado' },
+      rascunho: { cor: 'bg-yellow-100 text-yellow-800', texto: 'Rascunho' }
+    };
+    
+    const { cor, texto } = config[status] || config.rascunho;
+    return <span className={`px-2 py-1 rounded-full text-xs font-medium ${cor}`}>{texto}</span>;
   };
 
-  const getStatusText = (status) => {
-    switch (status) {
-      case 'publicado':
-        return 'Publicado';
-      case 'agendado':
-        return 'Agendado';
-      case 'rascunho':
-        return 'Rascunho';
-      default:
-        return status;
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("usuarioLogado");
-    navigate("/");
-  };
-
-  if (loading) {
+  const getPlataformaIcon = (plataforma) => {
+    const plataformas = {
+      instagram: { cor: 'text-pink-600', nome: 'Instagram' },
+      facebook: { cor: 'text-blue-600', nome: 'Facebook' },
+      twitter: { cor: 'text-blue-400', nome: 'Twitter' },
+      linkedin: { cor: 'text-blue-700', nome: 'LinkedIn' },
+      tiktok: { cor: 'text-black', nome: 'TikTok' }
+    };
+    
+    const plataformaInfo = plataformas[plataforma] || plataformas.instagram;
     return (
-      <div className="w-full max-w-[1200px] mx-auto p-5 pb-24 flex justify-center items-center min-h-[400px]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando dados...</p>
-        </div>
+      <div className={`flex items-center space-x-1 ${plataformaInfo.cor}`}>
+        <span className="text-sm font-medium">{plataformaInfo.nome}</span>
       </div>
     );
-  }
+  };
 
   return (
-    <div className="w-full max-w-[1200px] mx-auto p-5 pb-24">
-      <div className="flex justify-between items-center mb-8 pb-5 border-b border-gray-200">
-        <div className="flex items-center">
-          {perfil.foto ? (
-            <img
-              src={perfil.foto}
-              alt={`Foto de perfil de ${perfil.nome}`}
-              className="w-12 h-12 rounded-full border-2 border-orange-500 object-cover mr-4"
-            />
+    <div className="min-h-screen bg-gray-50 pb-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600 mt-2">
+            Bem-vindo de volta, {usuario?.nome || 'Usuário'}!
+          </p>
+        </div>
+
+        {/* Estatísticas */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-orange-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total de Posts</p>
+                <p className="text-2xl font-bold text-gray-900">{estatisticas.total}</p>
+              </div>
+              <div className="p-3 bg-orange-100 rounded-full">
+                <svg className="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-green-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Publicados</p>
+                <p className="text-2xl font-bold text-gray-900">{estatisticas.publicados}</p>
+              </div>
+              <div className="p-3 bg-green-100 rounded-full">
+                <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-blue-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Agendados</p>
+                <p className="text-2xl font-bold text-gray-900">{estatisticas.agendados}</p>
+              </div>
+              <div className="p-3 bg-blue-100 rounded-full">
+                <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-yellow-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Rascunhos</p>
+                <p className="text-2xl font-bold text-gray-900">{estatisticas.rascunhos}</p>
+              </div>
+              <div className="p-3 bg-yellow-100 rounded-full">
+                <svg className="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Ações Rápidas */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Link
+            to="/criar-post"
+            className="bg-white rounded-2xl shadow-lg p-6 border-2 border-dashed border-gray-300 hover:border-orange-500 hover:shadow-xl transition-all duration-300 group"
+          >
+            <div className="text-center">
+              <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-orange-500 transition-colors">
+                <PlusIcon />
+              </div>
+              <h3 className="font-semibold text-gray-900 group-hover:text-orange-600 transition-colors">
+                Criar Novo Post
+              </h3>
+              <p className="text-sm text-gray-600 mt-1">
+                Compartilhe suas ideias
+              </p>
+            </div>
+          </Link>
+
+          <Link
+            to="/analytics"
+            className="bg-white rounded-2xl shadow-lg p-6 border-2 border-gray-200 hover:border-blue-500 hover:shadow-xl transition-all duration-300 group"
+          >
+            <div className="text-center">
+              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-500 transition-colors">
+                <ChartIcon />
+              </div>
+              <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                Ver Estatísticas
+              </h3>
+              <p className="text-sm text-gray-600 mt-1">
+                Acompanhe seu desempenho
+              </p>
+            </div>
+          </Link>
+
+          <Link
+            to="/calendario"
+            className="bg-white rounded-2xl shadow-lg p-6 border-2 border-gray-200 hover:border-green-500 hover:shadow-xl transition-all duration-300 group"
+          >
+            <div className="text-center">
+              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-green-500 transition-colors">
+                <svg className="w-6 h-6 text-green-600 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v14a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-gray-900 group-hover:text-green-600 transition-colors">
+                Calendário
+              </h3>
+              <p className="text-sm text-gray-600 mt-1">
+                Gerencie seus agendamentos
+              </p>
+            </div>
+          </Link>
+        </div>
+
+        {/* Posts Recentes */}
+        <div className="bg-white rounded-2xl shadow-lg p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold text-gray-900">Posts Recentes</h2>
+            <Link
+              to="/criar-post"
+              className="bg-orange-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-orange-600 transition-colors"
+            >
+              Criar Post
+            </Link>
+          </div>
+
+          {posts.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <PlusIcon />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                Nenhum post criado ainda
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Comece criando seu primeiro post para ver ele aqui.
+              </p>
+              <Link
+                to="/criar-post"
+                className="bg-orange-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-orange-600 transition-colors inline-block"
+              >
+                Criar Primeiro Post
+              </Link>
+            </div>
           ) : (
-            <div className="w-12 h-12 rounded-full bg-orange-500 text-white flex items-center justify-center text-xl font-bold mr-4">
-              {perfil.nome.charAt(0).toUpperCase()}
+            <div className="space-y-4">
+              {posts.map((post) => (
+                <div
+                  key={`post-${post.id}-${post.plataforma}`}
+                  className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900 text-lg mb-1">
+                        {post.titulo}
+                      </h3>
+                      <p className="text-gray-600 text-sm line-clamp-2">
+                        {post.conteudo}
+                      </p>
+                    </div>
+                    {post.imagemUrl && (
+                      <img
+                        src={post.imagemUrl}
+                        alt="Post"
+                        className="w-16 h-16 object-cover rounded-lg ml-4"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                        }}
+                      />
+                    )}
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center space-x-4">
+                      {getPlataformaIcon(post.plataforma)}
+                      {getStatusBadge(post.status)}
+                      <span className="text-sm text-gray-500">
+                        {formatarData(post.status === 'agendado' ? post.data : post.createdAt)}
+                      </span>
+                    </div>
+                    
+                    {post.status === 'agendado' && (
+                      <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                        Agendado para {formatarData(post.data)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
-          <div>
-            <h1 className="text-xl font-bold">Boas-vindas, {perfil.nome}!</h1>
-            <p className="text-sm text-gray-500">Aqui estão seus dados de performance.</p>
-            {perfil.email && (
-              <p className="text-xs text-gray-400">{perfil.email}</p>
-            )}
-          </div>
+
+          {posts.length > 0 && (
+            <div className="mt-6 text-center">
+              <Link
+                to="/analytics"
+                className="text-orange-600 hover:text-orange-700 font-medium"
+              >
+                Ver todos os posts →
+              </Link>
+            </div>
+          )}
         </div>
-        
-        <button
-          onClick={handleLogout}
-          className="bg-gray-500 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors inline-block w-fit left-0"
-        >
-          Sair
-        </button>
-      </div>
-
-      {error && (
-        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
-          <p>{error}</p>
-        </div>
-      )}
-
-      {/* Cards de Métricas */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 mb-10">
-        <StatCard value={postsAgendados} label="Agendados" />
-        <StatCard value={postsPublicados} label="Publicados" />
-        <StatCard value={engajamento} label="Engajamento" />
-        <StatCard value={alcance} label="Alcance" />
-      </div>
-
-      {/* Conteúdo Adicional */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* Atividade Recente */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Atividade Recente</h2>
-          <div className="space-y-3">
-            {atividadesRecentes.length > 0 ? (
-              atividadesRecentes.map((atividade) => (
-                <div key={atividade.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
-                  <div className="flex items-center">
-                    <div className={`w-2 h-2 rounded-full mr-3 ${
-                      atividade.status === 'publicado' ? 'bg-green-500' :
-                      atividade.status === 'agendado' ? 'bg-blue-500' : 'bg-gray-400'
-                    }`}></div>
-                    <div>
-                      <span className="text-gray-700 block">{atividade.titulo}</span>
-                      <span className="text-gray-600 block">{atividade.conteudo}</span>
-                      <span className="text-gray-500 text-xs">{atividade.plataforma}</span>
-                    </div>
-                  </div>
-                  <span className={`text-xs px-2 py-1 rounded ${getStatusColor(atividade.status)}`}>
-                    {getStatusText(atividade.status)}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <p className="text-gray-500 text-center py-4">Nenhuma atividade recente</p>
-            )}
-          </div>
-        </div>
-
-        {/* Próximos Agendamentos */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Próximos Agendamentos</h2>
-          <div className="space-y-3">
-            {proximosAgendamentos.length > 0 ? (
-              proximosAgendamentos.map((agendamento) => (
-                <div key={agendamento.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
-                  <div>
-                    <span className="text-gray-700 font-medium block">
-                      {formatarData(agendamento.data)}
-                    </span>
-                    <p className="text-gray-500 text-sm">{agendamento.titulo}</p>
-                  </div>
-                  <span className="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded">
-                    {agendamento.data && new Date(agendamento.data) < new Date(Date.now() + 24 * 60 * 60 * 1000) 
-                      ? "Em breve" 
-                      : "Agendado"
-                    }
-                  </span>
-                </div>
-              ))
-            ) : (
-              <p className="text-gray-500 text-center py-4">Nenhum agendamento próximo</p>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Dicas Rápidas */}
-      <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl shadow-sm p-6 text-white">
-        <h2 className="text-lg font-semibold mb-2">Dica do Dia</h2>
-        <p className="text-orange-100">
-          {postsAgendados === 0 
-            ? "Comece agendando seus primeiros posts para manter uma presença consistente nas redes sociais!"
-            : `Você tem ${postsAgendados} posts agendados. Continue planejando seu conteúdo!`
-          }
-        </p>
       </div>
 
       <MobileNav location={location} />

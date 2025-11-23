@@ -76,14 +76,14 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="p-3.75 bg-orange-500 text-white border-none rounded-lg text-lg font-semibold cursor-pointer transition-all duration-300 hover:bg-orange-600 active:scale-99 mt-1 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-3.75 bg-orange-500 p-1.5 text-white border-none rounded-lg text-lg font-semibold cursor-pointer transition-all duration-300 hover:bg-orange-600 active:scale-99 mt-1 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Entrando...' : 'Entrar'}
           </button>
           <button
             type="button"
             onClick={() => navigate('/register')}
-            className="p-3.75 bg-blue-500 text-white border-none rounded-lg text-lg font-semibold cursor-pointer transition-all duration-300 hover:bg-blue-600 active:scale-99 mt-1"
+            className="p-3.75 bg-blue-500 p-1.5 text-white border-none rounded-lg text-lg font-semibold cursor-pointer transition-all duration-300 hover:bg-blue-600 active:scale-99 mt-1"
           >
             Registre-se
           </button>

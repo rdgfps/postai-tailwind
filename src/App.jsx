@@ -16,6 +16,7 @@ import NovaSenha from './components/NovaSenha.jsx';
 import Suporte from './components/Suporte.jsx';
 import CalendarioPosts from './components/CalendarioPosts.jsx';
 import { AuthProvider } from './components/AuthContext.jsx';
+import { postService } from './components/PostService.jsx';
 
 const Layout = ({ children }) => {
   return (
@@ -29,27 +30,39 @@ const Layout = ({ children }) => {
 };
 
 function App() {
+  React.useEffect(() => {
+    // Verificar posts agendados quando o app iniciar
+    postService.verificarEPublicarPostsAgendados();
+    
+    // Verificar a cada minuto
+    const interval = setInterval(postService.verificarEPublicarPostsAgendados, 60000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <Router>
-      <div className="App">
-        <Routes>
-          <Route path="/" element={<Login />} />      
-          <Route path="/register" element={<Register />} />
-          <Route path="/recuperar-senha" element={<RecuperarSenha />} />
-          <Route path="/email-enviado" element={<EmailEnviado />} />
-          <Route path="/nova-senha" element={<NovaSenha />} />
-          <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
-          <Route path="/analytics" element={<Layout><Analytics /></Layout>} />
-          <Route path="/criar-post" element={<Layout><CriarPost /></Layout>} />
-          <Route path="/perfil" element={<Layout><Perfil /></Layout>} />
-          <Route path="/configuracoes" element={<Layout><Configuracoes /></Layout>} />
-          <Route path="/editar-perfil" element={<Layout><EditarPerfil /></Layout>} />
-          <Route path="/ia" element={<Layout><Ia /></Layout>} />
-          <Route path="/suporte" element={<Layout><Suporte /></Layout>} />
-          <Route path="/calendario" element={<Layout><CalendarioPosts /></Layout>} />
-        </Routes>
-      </div>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <div className="App">
+          <Routes>
+            <Route path="/" element={<Login />} />      
+            <Route path="/register" element={<Register />} />
+            <Route path="/recuperar-senha" element={<RecuperarSenha />} />
+            <Route path="/email-enviado" element={<EmailEnviado />} />
+            <Route path="/nova-senha" element={<NovaSenha />} />
+            <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
+            <Route path="/analytics" element={<Layout><Analytics /></Layout>} />
+            <Route path="/criar-post" element={<Layout><CriarPost /></Layout>} />
+            <Route path="/perfil" element={<Layout><Perfil /></Layout>} />
+            <Route path="/configuracoes" element={<Layout><Configuracoes /></Layout>} />
+            <Route path="/editar-perfil" element={<Layout><EditarPerfil /></Layout>} />
+            <Route path="/ia" element={<Layout><Ia /></Layout>} />
+            <Route path="/suporte" element={<Layout><Suporte /></Layout>} />
+            <Route path="/calendario" element={<Layout><CalendarioPosts /></Layout>} />
+          </Routes>
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 
