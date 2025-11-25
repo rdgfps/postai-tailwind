@@ -9,13 +9,11 @@ const EmailEnviado = () => {
 
   return (
     <div className="recovery-container">
-      {/* Ícone da flor */}
       <div className="recovery-logo">
         <img src="/logopostai.png" alt="PostAi Logo" /> 
       </div>
 
       <div className="recovery-card">
-        {/* Ícone do E-mail Enviado */}
         <div className="icon-box">
           <AiOutlineMail />
         </div>
@@ -32,7 +30,6 @@ const EmailEnviado = () => {
           Verifique sua caixa de entrada e spam. O link expira em 30 minutos.
         </p>
 
-        {/* Botão de Reenvio */}
         <button type="button" className="btn-primary-orange">
           Reenviar E-mail
         </button>

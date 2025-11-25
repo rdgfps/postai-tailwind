@@ -1,4 +1,3 @@
-// components/Register.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
@@ -15,11 +14,9 @@ export default function Register() {
     setLoading(true);
 
     try {
-      // Buscar todos os usuários para verificar email e gerar ID
       const res = await fetch('http://localhost:3001/usuarios');
       const usuarios = await res.json();
 
-      // Verificar se email já existe
       const emailExistente = usuarios.find(usuario => usuario.email === email);
       if (emailExistente) {
         Swal.fire({
@@ -31,7 +28,6 @@ export default function Register() {
         return;
       }
 
-      // Gerar novo ID (último ID + 1)
       const novoId = usuarios.length > 0 ? Math.max(...usuarios.map(u => u.id)) + 1 : 1;
 
       const newUser = { 
@@ -40,14 +36,12 @@ export default function Register() {
         email, 
         senha,
         foto: "",
-        // Dados iniciais para estatísticas
         estatisticas: {
           engajamento: "0",
           alcance: "0"
         }
       };
 
-      // Criar usuário
       const createRes = await fetch('http://localhost:3001/usuarios', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -55,7 +49,6 @@ export default function Register() {
       });
 
       if (createRes.ok) {
-        // Criar estatísticas iniciais para o usuário
         await fetch('http://localhost:3001/estatisticas', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -67,23 +60,12 @@ export default function Register() {
           })
         });
 
-        // Criar posts iniciais vazios
-        await fetch('http://localhost:3001/posts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            usuarioId: novoId,
-            posts: []
-          })
-        });
-
         Swal.fire({
           title: "Bom trabalho!",
           text: "Cadastro realizado com sucesso!",
           icon: "success"
         });
 
-        // Fazer login automático
         localStorage.setItem("usuarioLogado", JSON.stringify(newUser));
         navigate('/dashboard');
       } else {

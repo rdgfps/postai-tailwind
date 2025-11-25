@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
+import ReactDOM from 'react-dom';
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { postService } from './PostService';
 
 const HomeIcon = () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>;
 const ChartIcon = () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>;
 const PlusIcon = () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>;
 const UserIcon = () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>;
 const SettingsIcon = () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>;
+const BellIcon = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM10.24 8.56a5.97 5.97 0 01-3.78-1.53A6 6 0 008 14v.001h8V14a6 6 0 00-9-5.197" /></svg>;
 
 const MobileNav = ({ location }) => {
   const NavItem = ({ to, icon: Icon, label }) => (
@@ -32,6 +33,80 @@ const MobileNav = ({ location }) => {
   );
 };
 
+const apiService = {
+  async getPosts() {
+    const response = await fetch("http://localhost:3001/posts");
+    if (!response.ok) throw new Error("Erro ao carregar posts");
+    return response.json();
+  },
+
+  async getUsuario(id) {
+    const response = await fetch(`http://localhost:3001/usuarios/${id}`);
+    if (!response.ok) throw new Error("Usuário não encontrado");
+    return response.json();
+  },
+
+  async criarPost(post) {
+    const response = await fetch("http://localhost:3001/posts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(post),
+    });
+    if (!response.ok) throw new Error("Erro ao criar post");
+    return response.json();
+  },
+
+  async atualizarPost(postId, updates) {
+    const response = await fetch(`http://localhost:3001/posts/${postId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updates),
+    });
+    if (!response.ok) throw new Error(`Erro ao atualizar post ${postId}`);
+    return response.json();
+  },
+};
+
+// Sistema de lembretes local (fallback)
+const LembreteService = {
+  KEY: 'postai_lembretes',
+
+  salvarLembrete(postId, texto) {
+    const lembretes = this.getLembretes();
+    lembretes[postId] = {
+      texto,
+      postId,
+      criadoEm: new Date().toISOString(),
+      atualizadoEm: new Date().toISOString()
+    };
+    localStorage.setItem(this.KEY, JSON.stringify(lembretes));
+    return lembretes[postId];
+  },
+
+  getLembretes() {
+    return JSON.parse(localStorage.getItem(this.KEY) || '{}');
+  },
+
+  getLembrete(postId) {
+    const lembretes = this.getLembretes();
+    return lembretes[postId] || null;
+  },
+
+  deletarLembrete(postId) {
+    const lembretes = this.getLembretes();
+    if (lembretes[postId]) {
+      delete lembretes[postId];
+      localStorage.setItem(this.KEY, JSON.stringify(lembretes));
+      return true;
+    }
+    return false;
+  }
+};
+
 const Dashboard = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -43,72 +118,100 @@ const Dashboard = () => {
     agendados: 0,
     rascunhos: 0
   });
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState("");
 
-  // Verificar posts agendados e atualizar estatísticas
-  const atualizarEstatisticas = async () => {
-    const usuarioLogado = localStorage.getItem("usuarioLogado");
-    if (usuarioLogado) {
-      const userData = JSON.parse(usuarioLogado);
-      // Verificar se o userId é válido
-      if (userData.id && userData.id !== "null" && userData.id !== "undefined") {
-        const stats = await postService.buscarEstatisticas(userData.id);
-        setEstatisticas(stats);
+  const [lembreteModal, setLembreteModal] = useState({ 
+    isOpen: false,
+    postId: null, 
+    texto: '',
+    tituloModal: '',
+    postTitulo: ''
+  });
+  const [erroLembrete, setErroLembrete] = useState('');
+  const [lembretesLocais, setLembretesLocais] = useState({});
+
+  const inicializarUsuario = async () => {
+    try {
+      const usuarioSalvo = localStorage.getItem("usuarioLogado");
+      
+      if (usuarioSalvo) {
+        const userData = JSON.parse(usuarioSalvo);
+        try {
+          const usuarioAPI = await apiService.getUsuario(userData.id);
+          setUsuario(usuarioAPI);
+          return usuarioAPI;
+        } catch (error) {
+          setUsuario(userData);
+          return userData;
+        }
+      } else {
+        const usuarioDemo = await apiService.getUsuario("1");
+        localStorage.setItem("usuarioLogado", JSON.stringify(usuarioDemo));
+        setUsuario(usuarioDemo);
+        return usuarioDemo;
       }
+    } catch (error) {
+      console.error("Erro ao carregar usuário:", error);
+      const usuarioFallback = {
+        id: "1",
+        nome: "Usuário Demo",
+        email: "usuario@demo.com",
+        bio: "Bem-vindo ao PostAí!"
+      };
+      localStorage.setItem("usuarioLogado", JSON.stringify(usuarioFallback));
+      setUsuario(usuarioFallback);
+      return usuarioFallback;
     }
   };
 
   const carregarPosts = async () => {
     try {
-      const usuarioLogado = localStorage.getItem("usuarioLogado");
-      if (usuarioLogado) {
-        const userData = JSON.parse(usuarioLogado);
-        
-        // Verificar se o userId é válido
-        if (!userData.id || userData.id === "null" || userData.id === "undefined") {
-          console.error("ID de usuário inválido no localStorage");
-          return;
-        }
+      setCarregando(true);
+      setErro("");
+      
+      const usuarioAtual = await inicializarUsuario();
+      const todosPosts = await apiService.getPosts();
+      
+      const postsDoUsuario = todosPosts.filter(
+        post => post.usuarioId && post.usuarioId.toString() === usuarioAtual.id.toString()
+      );
 
-        setUsuario(userData);
+      // Carrega lembretes locais
+      const lembretes = LembreteService.getLembretes();
+      setLembretesLocais(lembretes);
 
-        const response = await fetch("http://localhost:3001/posts");
-        if (!response.ok) {
-          throw new Error("Erro ao carregar posts");
-        }
+      // Combina posts da API com lembretes locais
+      const postsComLembretes = postsDoUsuario.map(post => ({
+        ...post,
+        lembrete: lembretes[post.id]?.texto || post.lembrete || ''
+      }));
 
-        const todosPosts = await response.json();
-        
-        const postsDoUsuario = todosPosts.filter(
-          (post) => post.usuarioId && post.usuarioId.toString() === userData.id.toString()
-        );
-        
-        // Ordenar posts por data (mais recentes primeiro)
-        const postsOrdenados = postsDoUsuario.sort((a, b) => 
-          new Date(b.createdAt) - new Date(a.createdAt)
-        );
-        
-        setPosts(postsOrdenados.slice(0, 5)); // Mostrar apenas os 5 mais recentes
-        await atualizarEstatisticas();
-      }
+      const postsOrdenados = postsComLembretes.sort((a, b) => 
+        new Date(b.createdAt) - new Date(a.createdAt)
+      );
+
+      setPosts(postsOrdenados.slice(0, 5));
+      
+      setEstatisticas({
+        total: postsDoUsuario.length,
+        publicados: postsDoUsuario.filter(p => p.status === 'publicado').length,
+        agendados: postsDoUsuario.filter(p => p.status === 'agendado').length,
+        rascunhos: postsDoUsuario.filter(p => p.status === 'rascunho').length
+      });
+
     } catch (error) {
       console.error("Erro ao carregar posts:", error);
+      setErro("Não foi possível carregar os posts. Verifique se o JSON Server está rodando.");
+      setPosts([]);
+      setEstatisticas({ total: 0, publicados: 0, agendados: 0, rascunhos: 0 });
+    } finally {
+      setCarregando(false);
     }
   };
 
   useEffect(() => {
-    // Verificar posts agendados quando o dashboard carregar
-    postService.verificarEPublicarPostsAgendados().then(() => {
-      carregarPosts();
-    });
-
-    // Atualizar estatísticas periodicamente
-    const interval = setInterval(() => {
-      postService.verificarEPublicarPostsAgendados().then(() => {
-        carregarPosts();
-      });
-    }, 30000); // A cada 30 segundos
-
-    return () => clearInterval(interval);
+    carregarPosts();
   }, []);
 
   const formatarData = (dataString) => {
@@ -154,10 +257,118 @@ const Dashboard = () => {
     );
   };
 
+  const handleAbrirLembreteModal = (post) => {
+    const isEditing = !!post.lembrete;
+    setLembreteModal({ 
+      isOpen: true,
+      postId: post.id.toString(), 
+      texto: post.lembrete || '',
+      tituloModal: isEditing ? 'Editar Lembrete' : 'Adicionar Lembrete',
+      postTitulo: post.titulo
+    });
+    setErroLembrete('');
+  };
+
+  const handleFecharLembreteModal = () => {
+    setLembreteModal(prev => ({ ...prev, isOpen: false }));
+  };
+
+  const handleSalvarLembrete = async (e) => {
+    e.preventDefault();
+    if (!lembreteModal.postId) return;
+
+    const novoLembrete = lembreteModal.texto.trim();
+
+    try {
+      setErroLembrete('');
+      
+      // Tenta salvar na API primeiro
+      try {
+        await apiService.atualizarPost(lembreteModal.postId, { lembrete: novoLembrete });
+      } catch (apiError) {
+        console.log("API não disponível, salvando localmente:", apiError);
+        // Se a API falhar, salva localmente
+        LembreteService.salvarLembrete(lembreteModal.postId, novoLembrete);
+      }
+
+      // Atualiza a UI
+      setPosts(prevPosts => 
+        prevPosts.map(post => 
+          post.id.toString() === lembreteModal.postId.toString() 
+            ? { ...post, lembrete: novoLembrete } 
+            : post
+        )
+      );
+
+      // Atualiza lembretes locais
+      setLembretesLocais(prev => ({
+        ...prev,
+        [lembreteModal.postId]: { texto: novoLembrete }
+      }));
+
+      handleFecharLembreteModal();
+      
+    } catch (error) {
+      console.error("Erro ao salvar lembrete:", error);
+      setErroLembrete("Erro ao salvar lembrete. Tente novamente.");
+    }
+  };
+
+  const handleExcluirLembrete = async (postId) => {
+    try {
+      // Tenta excluir da API
+      try {
+        await apiService.atualizarPost(postId, { lembrete: '' });
+      } catch (apiError) {
+        console.log("API não disponível, excluindo localmente:", apiError);
+        // Se a API falhar, exclui localmente
+        LembreteService.deletarLembrete(postId);
+      }
+
+      // Atualiza a UI
+      setPosts(prevPosts => 
+        prevPosts.map(post => 
+          post.id.toString() === postId.toString() 
+            ? { ...post, lembrete: '' } 
+            : post
+        )
+      );
+
+      // Atualiza lembretes locais
+      setLembretesLocais(prev => {
+        const newLembretes = { ...prev };
+        delete newLembretes[postId];
+        return newLembretes;
+      });
+
+    } catch (error) {
+      console.error("Erro ao excluir lembrete:", error);
+    }
+  };
+
+  if (carregando) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Carregando dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+        {erro && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <p className="text-red-800">{erro}</p>
+            <p className="text-red-600 text-sm mt-1">
+              Certifique-se de que o JSON Server está rodando na porta 3001
+            </p>
+          </div>
+        )}
+
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-gray-600 mt-2">
@@ -165,7 +376,6 @@ const Dashboard = () => {
           </p>
         </div>
 
-        {/* Estatísticas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-orange-500">
             <div className="flex items-center justify-between">
@@ -174,9 +384,7 @@ const Dashboard = () => {
                 <p className="text-2xl font-bold text-gray-900">{estatisticas.total}</p>
               </div>
               <div className="p-3 bg-orange-100 rounded-full">
-                <svg className="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
+                <PlusIcon />
               </div>
             </div>
           </div>
@@ -188,9 +396,7 @@ const Dashboard = () => {
                 <p className="text-2xl font-bold text-gray-900">{estatisticas.publicados}</p>
               </div>
               <div className="p-3 bg-green-100 rounded-full">
-                <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+                <ChartIcon />
               </div>
             </div>
           </div>
@@ -224,7 +430,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Ações Rápidas */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Link
             to="/criar-post"
@@ -280,7 +485,6 @@ const Dashboard = () => {
           </Link>
         </div>
 
-        {/* Posts Recentes */}
         <div className="bg-white rounded-2xl shadow-lg p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-gray-900">Posts Recentes</h2>
@@ -319,26 +523,56 @@ const Dashboard = () => {
                 >
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 text-lg mb-1">
+                      <h3 className="font-semibold text-gray-900 text-lg mb-2">
                         {post.titulo}
                       </h3>
                       <p className="text-gray-600 text-sm line-clamp-2">
                         {post.conteudo}
                       </p>
+                      {post.lembrete && (
+                        <div className="mt-2 flex items-center justify-between p-2 bg-yellow-50 border border-yellow-200 rounded-lg">
+                          <div className="flex items-center">
+                            <BellIcon />
+                            <span className="text-sm text-yellow-800 font-medium ml-2">
+                              Lembrete: {post.lembrete}
+                            </span>
+                          </div>
+                          <button
+                            onClick={() => handleExcluirLembrete(post.id)}
+                            className="text-yellow-600 hover:text-yellow-800 text-xs font-medium"
+                          >
+                            Excluir
+                          </button>
+                        </div>
+                      )}
                     </div>
-                    {post.imagemUrl && (
-                      <img
-                        src={post.imagemUrl}
-                        alt="Post"
-                        className="w-16 h-16 object-cover rounded-lg ml-4"
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                        }}
-                      />
-                    )}
+
+                    <div className="flex flex-col items-end space-y-2 ml-4">
+                      <button
+                        onClick={() => handleAbrirLembreteModal(post)}
+                        className={`text-xs px-3 py-1 rounded-lg font-medium transition-colors ${
+                          post.lembrete 
+                          ? 'bg-yellow-500 text-white hover:bg-yellow-600' 
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        }`}
+                      >
+                        {post.lembrete ? 'Editar Lembrete' : 'Adicionar Lembrete'}
+                      </button>
+
+                      {post.imagemUrl && (
+                        <img
+                          src={post.imagemUrl}
+                          alt="Post"
+                          className="w-16 h-16 object-cover rounded-lg"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      )}
+                    </div>
                   </div>
                   
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center mt-3">
                     <div className="flex items-center space-x-4">
                       {getPlataformaIcon(post.plataforma)}
                       {getStatusBadge(post.status)}
@@ -370,6 +604,60 @@ const Dashboard = () => {
           )}
         </div>
       </div>
+
+      {lembreteModal.isOpen && ReactDOM.createPortal(
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" onClick={handleFecharLembreteModal}>
+          <div 
+            className="bg-white rounded-lg shadow-xl w-full max-w-lg p-6"
+            onClick={(e) => e.stopPropagation()} 
+          >
+            <div className="flex justify-between items-center border-b pb-3 mb-4">
+              <h3 className="text-xl font-semibold text-gray-900">{lembreteModal.tituloModal}</h3>
+              <button 
+                onClick={handleFecharLembreteModal} 
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="mb-4">
+              <p className="text-sm text-gray-600 mb-2">
+                Post: <span className="font-semibold">{lembreteModal.postTitulo}</span>
+              </p>
+            </div>
+            
+            <form onSubmit={handleSalvarLembrete}>
+              <textarea
+                value={lembreteModal.texto}
+                onChange={(e) => setLembreteModal({ ...lembreteModal, texto: e.target.value })}
+                placeholder="Ex: Não esquecer de analisar o feedback..."
+                className="w-full h-32 px-3 py-2 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 mb-4 resize-none"
+                rows="4"
+              />
+              {erroLembrete && <p className="text-red-500 text-sm mb-2">{erroLembrete}</p>}
+              <div className="flex justify-end space-x-2">
+                <button
+                  type="button"
+                  onClick={handleFecharLembreteModal}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm font-medium text-white bg-orange-500 rounded-lg hover:bg-orange-600 transition-colors"
+                >
+                  Salvar Lembrete
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>,
+        document.body
+      )}
 
       <MobileNav location={location} />
     </div>

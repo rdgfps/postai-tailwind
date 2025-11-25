@@ -1,5 +1,3 @@
-// src/services/postService.js
-
 const API_URL = "http://localhost:3001";
 
 export const postService = {
@@ -36,7 +34,6 @@ export const postService = {
 
   async buscarEstatisticas(usuarioId) {
     try {
-      // Verificar se o userId é válido
       if (!usuarioId || usuarioId === "null" || usuarioId === "undefined") {
         return { total: 0, publicados: 0, agendados: 0, rascunhos: 0 };
       }

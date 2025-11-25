@@ -15,9 +15,8 @@ const EditarPerfil = () => {
 
   const [loading, setLoading] = useState(false);
 
-  // Carregar dados do usuário
   useEffect(() => {
-    const carregarUsuario = async () => {
+    const carregarUsuario = () => {
       try {
         const usuarioLogado = localStorage.getItem("usuarioLogado");
         if (!usuarioLogado) {
@@ -26,30 +25,12 @@ const EditarPerfil = () => {
         }
 
         const userData = JSON.parse(usuarioLogado);
-        const userId = userData.id;
-
-        // Verificar se o userId é válido
-        if (!userId || userId === "null" || userId === "undefined") {
-          console.error("ID de usuário inválido");
-          Swal.fire("Erro", "ID de usuário inválido", "error");
-          navigate("/perfil");
-          return;
-        }
-
-        // Buscar dados atualizados do usuário
-        const response = await fetch(`http://localhost:3001/usuarios/${userId}`);
-        
-        if (!response.ok) {
-          throw new Error("Usuário não encontrado");
-        }
-
-        const usuario = await response.json();
         
         setFormData({
-          nome: usuario.nome || "",
-          email: usuario.email || "",
-          bio: usuario.bio || "",
-          foto: usuario.foto || ""
+          nome: userData.nome || "",
+          email: userData.email || "",
+          bio: userData.bio || "",
+          foto: userData.foto || ""
         });
 
       } catch (error) {
@@ -87,16 +68,7 @@ const EditarPerfil = () => {
       }
 
       const userData = JSON.parse(usuarioLogado);
-      const userId = userData.id;
 
-      // Verificar se o userId é válido
-      if (!userId || userId === "null" || userId === "undefined") {
-        console.error("ID de usuário inválido");
-        Swal.fire("Erro", "ID de usuário inválido", "error");
-        return;
-      }
-
-      // Validações básicas
       if (!formData.nome.trim()) {
         Swal.fire({
           title: "Campo obrigatório",
@@ -117,36 +89,15 @@ const EditarPerfil = () => {
         return;
       }
 
-      // Buscar usuário existente
-      const response = await fetch(`http://localhost:3001/usuarios/${userId}`);
-      
-      if (!response.ok) {
-        throw new Error("Usuário não encontrado");
-      }
-
-      const usuarioExistente = await response.json();
-
       const usuarioAtualizado = {
-        ...usuarioExistente,
+        ...userData,
         nome: formData.nome.trim(),
         email: formData.email.trim(),
         bio: formData.bio.trim(),
-        foto: formData.foto.trim()
+        foto: formData.foto.trim(),
+        atualizadoEm: new Date().toISOString()
       };
 
-      const updateResponse = await fetch(`http://localhost:3001/usuarios/${userId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(usuarioAtualizado),
-      });
-
-      if (!updateResponse.ok) {
-        throw new Error("Erro ao atualizar perfil");
-      }
-
-      // Atualizar localStorage
       localStorage.setItem("usuarioLogado", JSON.stringify(usuarioAtualizado));
       
       Swal.fire({
@@ -162,7 +113,7 @@ const EditarPerfil = () => {
       console.error("Erro ao salvar perfil:", error);
       Swal.fire({
         title: "Erro",
-        text: "Não foi possível atualizar o perfil. Verifique se o servidor está rodando.",
+        text: "Não foi possível atualizar o perfil.",
         icon: "error",
         confirmButtonColor: "#f97316",
       });
@@ -175,11 +126,24 @@ const EditarPerfil = () => {
     navigate("/perfil");
   };
 
+  const handleFotoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setFormData(prev => ({
+          ...prev,
+          foto: event.target.result
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-2xl shadow-lg p-8">
-          {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">Editar Perfil</h1>
             <p className="text-gray-600 mt-2">
@@ -187,37 +151,51 @@ const EditarPerfil = () => {
             </p>
           </div>
 
-          {/* Formulário */}
           <div className="space-y-6">
-            {/* Foto do Perfil */}
             <div className="space-y-3">
               <label className="block text-sm font-medium text-gray-700">
-                Foto do Perfil (URL)
+                Foto do Perfil
               </label>
-              <input
-                type="url"
-                name="foto"
-                value={formData.foto}
-                onChange={handleChange}
-                placeholder="https://exemplo.com/sua-foto.jpg"
-                className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-100 transition"
-              />
-              {formData.foto && (
-                <div className="mt-2">
-                  <p className="text-sm text-gray-600 mb-2">Prévia:</p>
-                  <img
-                    src={formData.foto}
-                    alt="Prévia da foto"
-                    className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                    }}
+              
+              <div className="flex items-center space-x-6">
+                <div className="relative">
+                  <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
+                    {formData.foto ? (
+                      <img
+                        src={formData.foto}
+                        alt="Foto do perfil"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-2xl font-bold text-gray-600">
+                        {formData.nome?.charAt(0) || "U"}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="flex-1 space-y-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFotoUpload}
+                    className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
+                  />
+                  <p className="text-xs text-gray-500">
+                    Ou insira uma URL da imagem:
+                  </p>
+                  <input
+                    type="url"
+                    name="foto"
+                    value={formData.foto}
+                    onChange={handleChange}
+                    placeholder="https://exemplo.com/sua-foto.jpg"
+                    className="w-full p-2 border border-gray-300 rounded text-sm"
                   />
                 </div>
-              )}
+              </div>
             </div>
 
-            {/* Nome */}
             <div className="space-y-3">
               <label className="block text-sm font-medium text-gray-700">
                 Nome *
@@ -233,7 +211,6 @@ const EditarPerfil = () => {
               />
             </div>
 
-            {/* Email */}
             <div className="space-y-3">
               <label className="block text-sm font-medium text-gray-700">
                 Email *
@@ -249,34 +226,26 @@ const EditarPerfil = () => {
               />
             </div>
 
-            {/* Bio */}
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-gray-700">
-                Bio
-              </label>
-              <textarea
-                name="bio"
-                value={formData.bio}
-                onChange={handleChange}
-                placeholder="Conte um pouco sobre você..."
-                rows="4"
-                className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-100 transition resize-vertical"
-              />
-            </div>
-
-            {/* Botões */}
             <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
               <button
                 onClick={handleSave}
                 disabled={loading}
-                className="flex-1 bg-orange-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 bg-orange-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
-                {loading ? "Salvando..." : "Salvar Alterações"}
+                {loading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Salvando...
+                  </>
+                ) : (
+                  "Salvar Alterações"
+                )}
               </button>
               
               <button
                 onClick={handleCancel}
-                className="flex-1 bg-gray-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-gray-600 transition-colors"
+                disabled={loading}
+                className="flex-1 bg-gray-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-gray-600 transition-colors disabled:opacity-50"
               >
                 Cancelar
               </button>

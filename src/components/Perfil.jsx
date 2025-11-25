@@ -72,7 +72,7 @@ const Perfil = () => {
               
               <div className="flex gap-6 mt-6 text-center">
                 <div>
-                  <div className="text-2xl font-bold text-gray-900">1</div>
+                  <div className="text-2xl font-bold text-gray-900">0</div>
                   <div className="text-sm text-gray-600">Posts</div>
                 </div>
                 <div>
@@ -87,7 +87,7 @@ const Perfil = () => {
             </div>
 
             <div className="mt-8 space-y-4">
-              <button className="w-full bg-orange-500 text-white py-3 rounded-lg font-medium hover:bg-orange-600 transition-colors">
+              <button onClick={() => navigate('/editar-perfil')} className="w-full bg-orange-500 text-white py-3 rounded-lg font-medium hover:bg-orange-600 transition-colors">
                 Editar Perfil
               </button>
               

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AiOutlineLock } from 'react-icons/ai'; // Ícone de cadeado
+import { AiOutlineLock } from 'react-icons/ai';
 import '../styles/RecuperarSenha.css'; 
 import Swal from 'sweetalert2';
 
@@ -9,7 +9,6 @@ const NovaSenha = () => {
   const [novaSenha, setNovaSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
 
-  // Função fictícia para simular a redefinição da senha
   const handleRedefinir = (e) => {
     e.preventDefault();
 
@@ -32,7 +31,6 @@ const NovaSenha = () => {
         return;
     }
 
-    // Em um app real, você faria a chamada à API para atualizar a senha
     console.log('Senha redefinida com sucesso.');
     
     Swal.fire({
@@ -41,19 +39,16 @@ const NovaSenha = () => {
         icon: "success"
     });
 
-    // Navega para a tela de login após a redefinição
     navigate('/'); 
   };
 
   return (
     <div className="recovery-container">
-      {/* Ícone da flor */}
       <div className="recovery-logo">
         <img src="/path/to/your/flower-logo.png" alt="PostAi Logo" /> 
       </div>
 
       <div className="recovery-card">
-        {/* Ícone da Nova Senha */}
         <div className="icon-box" style={{backgroundColor: 'var(--cor-principal, #3498db)'}}>
           <AiOutlineLock />
         </div>

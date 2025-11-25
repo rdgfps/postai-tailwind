@@ -1,4 +1,3 @@
-// components/EngagementChart.jsx - Versão SEM dependências externas
 import React, { useState, useEffect } from 'react';
 
 const EngagementChart = () => {
@@ -46,7 +45,6 @@ const EngagementChart = () => {
           return (
             <div key={index} className="flex-1 flex flex-col items-center">
               <div className="flex items-end space-x-1 h-48 w-full justify-center">
-                {/* Barra de Alcance */}
                 <div className="flex flex-col items-center">
                   <div 
                     className="w-4 bg-blue-500 rounded-t transition-all duration-300 hover:bg-blue-600 cursor-pointer"
@@ -56,7 +54,6 @@ const EngagementChart = () => {
                   <span className="text-xs text-blue-600 font-medium mt-1">{item.Alcance}</span>
                 </div>
                 
-                {/* Barra de Engajamento */}
                 <div className="flex flex-col items-center">
                   <div 
                     className="w-4 bg-orange-500 rounded-t transition-all duration-300 hover:bg-orange-600 cursor-pointer"

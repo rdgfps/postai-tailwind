@@ -57,11 +57,8 @@ const CriarPost = () => {
 
   const [modoAgendamento, setModoAgendamento] = useState(false);
 
-  // Verificar posts agendados quando o componente montar
   React.useEffect(() => {
     postService.verificarEPublicarPostsAgendados();
-    
-    // Verificar a cada minuto
     const interval = setInterval(postService.verificarEPublicarPostsAgendados, 60000);
     return () => clearInterval(interval);
   }, []);
@@ -82,7 +79,6 @@ const CriarPost = () => {
 
   const toggleModoAgendamento = () => {
     setModoAgendamento(!modoAgendamento);
-    // Limpar dados de agendamento quando desativado
     if (modoAgendamento) {
       setFormData(prev => ({
         ...prev,
@@ -129,11 +125,8 @@ const CriarPost = () => {
       if (modoAgendamento && formData.dataAgendamento && formData.horarioAgendamento) {
         dataAgendamentoCompleta = `${formData.dataAgendamento}T${formData.horarioAgendamento}:00`;
         status = "agendado";
-        
-        // Verificar se a data/hora é futura
         const dataAgendada = new Date(dataAgendamentoCompleta);
         const agora = new Date();
-        
         if (dataAgendada <= agora) {
           Swal.fire({
             title: "Data inválida",
@@ -169,6 +162,7 @@ const CriarPost = () => {
           data: dataAgendamentoCompleta || new Date().toISOString(),
           imagemUrl: formData.imagemUrl || "",
           createdAt: new Date().toISOString(),
+          lembrete: formData.lembrete || "",
           agendadoEm: status === "agendado" ? new Date().toISOString() : null,
         });
       }
@@ -187,9 +181,7 @@ const CriarPost = () => {
       const allSuccessful = results.every((result) => result.ok);
 
       if (allSuccessful) {
-        // Verificar se algum post agendado já pode ser publicado
         await postService.verificarEPublicarPostsAgendados();
-        
         Swal.fire({
           title: "Sucesso!",
           text:
@@ -301,7 +293,6 @@ const CriarPost = () => {
               </div>
             </div>
 
-            {/* Seção de Agendamento - Agora opcional */}
             <div className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl p-6 border border-orange-200">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">

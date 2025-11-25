@@ -4,11 +4,10 @@
   --cor-fundo: #f4f7f9; 
   --cor-card-fundo: #ffffff;
   --cor-texto: #333333;
-  --cor-fundo-app: #0d1e57; /* Azul escuro do fundo */
-  --cor-destaque: #e84118; /* Cor secundária (laranja/vermelho vibrante) */
+  --cor-fundo-app: #0d1e57; 
+  --cor-destaque: #e84118; 
 }
 
-/* --- Container Principal (Fundo Azul Escuro) --- */
 .recovery-container {
   display: flex;
   flex-direction: column;
@@ -18,10 +17,9 @@
   min-height: 100vh;
   background-color: var(--cor-fundo-app, #0d1e57);
   padding: 20px;
-  position: relative; /* Para posicionar o ícone/logo */
+  position: relative; 
 }
 
-/* --- Imagem de Fundo (O Ícone/Logo) --- */
 .recovery-logo {
   margin-bottom: 80px;
   position: absolute;
@@ -33,7 +31,6 @@
   height: auto;
 }
 
-/* --- Card Centralizado (Branco) --- */
 .recovery-card {
   background-color: var(--cor-card-fundo);
   padding: 30px;
@@ -42,10 +39,9 @@
   width: 100%;
   max-width: 350px;
   text-align: center;
-  margin-top: 150px; /* Espaço para a logo/flor */
+  margin-top: 150px; 
 }
 
-/* --- Ícone Principal (Cima do Card) --- */
 .icon-box {
   width: 60px;
   height: 60px;
@@ -56,11 +52,10 @@
   justify-content: center;
   align-items: center;
   font-size: 1.8rem;
-  margin: -60px auto 20px auto; /* Para subir o ícone para fora do card */
+  margin: -60px auto 20px auto; 
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* --- Títulos e Subtítulos --- */
 .card-title {
   font-size: 1.5rem;
   font-weight: 700;
@@ -74,7 +69,6 @@
   margin-bottom: 25px;
 }
 
-/* --- Input --- */
 .recovery-form input {
   width: 100%;
   padding: 12px 15px;
@@ -84,7 +78,6 @@
   font-size: 1rem;
 }
 
-/* --- Botão Laranja Principal --- */
 .btn-primary-orange {
   display: block;
   width: 100%;
@@ -106,7 +99,6 @@
   background-color: #e67e22;
 }
 
-/* --- Link Secundário (Fazer Login) --- */
 .link-secondary {
   display: block;
   color: var(--cor-botoes-laranja);
@@ -116,7 +108,6 @@
   font-size: 0.9rem;
 }
 
-/* --- Texto Informativo --- */
 .info-text {
   font-size: 0.9rem;
   color: #777;
@@ -124,7 +115,6 @@
   line-height: 1.5;
 }
 
-/* --- REGRAS DE SENHA --- */
 .password-rules {
   text-align: left;
   margin: 15px 0 25px 0;

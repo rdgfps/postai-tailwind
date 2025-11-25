@@ -1,174 +1,65 @@
 {
-  "usuarios": [
-    {
-      "id": "1",
-      "nome": "João Silva",
-      "email": "joao@email.com",
-      "senha": "123456",
-      "foto": "",
-      "dataCadastro": "2024-01-15"
-    },
-    {
-      "id": "5475",
-      "nome": "pedro",
-      "email": "pedro@email.com",
-      "senha": "1234",
-      "foto": "https://imgs.search.brave.com/IC6I6tbSvmY02OXIuBHSQR-ZvQomXJsPq7J7U9aC-kE/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9hdmF0/YXJzLmdpdGh1YnVz/ZXJjb250ZW50LmNv/bS91LzE3MDY1MTE2/P3Y9NA",
-      "bio": ""
-    },
-    {
-      "id": "5476",
-      "nome": "henrique",
-      "email": "henrique@email.com",
-      "senha": "1234",
-      "foto": "",
-      "estatisticas": {
-        "engajamento": "0",
-        "alcance": "0"
-      }
-    },
-    {
-      "id": 5477,
-      "nome": "nara rejane maschke",
-      "email": "maschkenara@gmail.com",
-      "senha": "1234",
-      "foto": "",
-      "estatisticas": {
-        "engajamento": "0",
-        "alcance": "0"
-      }
-    }
-  ],
   "posts": [
     {
-      "id": "1",
-      "usuarioId": "5475",
-      "titulo": "dev com ia",
-      "conteudo": "devs com iaaa",
+      "id": 1,
+      "usuarioId": 3,
+      "titulo": "pedro",
+      "conteudo": "aula",
       "plataforma": "instagram",
-      "status": "rascunho",
-      "data": null,
+      "status": "publicado",
+      "data": "2025-11-25T02:22:37.820Z",
       "imagemUrl": "https://imgs.search.brave.com/SdmsNLS2lzMtubZv-f6XXnqPuUNKCznso6KO1yoNHXQ/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9sZWtr/ZXIuY29tLmJyL3By/b2R1dG9zL2NhcGFz/L2NhcGFfc3Vjb19k/ZV9tYXJhY3VqYV8x/LmpwZw",
-      "createdAt": "2025-11-23T02:13:37.232Z"
-    },
-    {
-      "id": "2",
-      "usuarioId": "5475",
-      "titulo": "suco de maracuja",
-      "conteudo": "sucoooo",
-      "plataforma": "tiktok",
-      "status": "rascunho",
-      "data": null,
-      "imagemUrl": "https://imgs.search.brave.com/OWGuipvl5GyN0lp7YPVDK70Hx65bx3PBDsxqhx7Ok3s/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9pbWcw/LmljYXJyb3MuY29t/L2RiaW1nL2ltZ2Fk/aWNpb25hbGFudW5j/aW8vMS80NDYxOTYy/MjRfMS5qcGc",
-      "createdAt": "2025-11-23T02:15:16.554Z"
-    },
-    {
-      "id": "3",
-      "usuarioId": "5475",
-      "titulo": "clash royale",
-      "conteudo": "pirotecnica",
-      "plataforma": "twitter",
-      "status": "agendado",
-      "data": "2025-11-23T23:35:00",
-      "imagemUrl": "https://imgs.search.brave.com/SdmsNLS2lzMtubZv-f6XXnqPuUNKCznso6KO1yoNHXQ/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9sZWtr/ZXIuY29tLmJyL3By/b2R1dG9zL2NhcGFz/L2NhcGFfc3Vjb19k/ZV9tYXJhY3VqYV8x/LmpwZw",
-      "createdAt": "2025-11-23T02:28:59.943Z"
-    },
-    {
-      "id": "d8f8",
-      "usuarioId": 5476,
-      "posts": []
-    },
-    {
-      "id": null,
-      "usuarioId": "5475",
-      "titulo": "animais",
-      "conteudo": "porco",
-      "plataforma": "tiktok",
-      "status": "agendado",
-      "data": "2025-11-23T15:51:00",
-      "imagemUrl": "https://imgs.search.brave.com/SdmsNLS2lzMtubZv-f6XXnqPuUNKCznso6KO1yoNHXQ/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9sZWtr/ZXIuY29tLmJyL3By/b2R1dG9zL2NhcGFz/L2NhcGFfc3Vjb19k/ZV9tYXJhY3VqYV8x/LmpwZw",
-      "createdAt": "2025-11-23T18:50:34.479Z"
-    },
-    {
-      "id": null,
-      "usuarioId": "5475",
-      "titulo": "agua",
-      "conteudo": "sem ou com gas",
-      "plataforma": "twitter",
-      "status": "publicado",
-      "data": "2025-11-23T18:58:24.973Z",
-      "imagemUrl": "https://imgs.search.brave.com/OWGuipvl5GyN0lp7YPVDK70Hx65bx3PBDsxqhx7Ok3s/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9pbWcw/LmljYXJyb3MuY29t/L2RiaW1nL2ltZ2Fk/aWNpb25hbGFudW5j/aW8vMS80NDYxOTYy/MjRfMS5qcGc",
-      "createdAt": "2025-11-23T18:58:24.973Z"
-    },
-    {
-      "id": null,
-      "usuarioId": "5475",
-      "titulo": "agua",
-      "conteudo": "sem ou com gas",
-      "plataforma": "tiktok",
-      "status": "publicado",
-      "data": "2025-11-23T18:58:24.973Z",
-      "imagemUrl": "https://imgs.search.brave.com/OWGuipvl5GyN0lp7YPVDK70Hx65bx3PBDsxqhx7Ok3s/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9pbWcw/LmljYXJyb3MuY29t/L2RiaW1nL2ltZ2Fk/aWNpb25hbGFudW5j/aW8vMS80NDYxOTYy/MjRfMS5qcGc",
-      "createdAt": "2025-11-23T18:58:24.973Z"
-    },
-    {
-      "id": null,
-      "usuarioId": "5475",
-      "titulo": "agua",
-      "conteudo": "sem ou com gas",
-      "plataforma": "linkedin",
-      "status": "publicado",
-      "data": "2025-11-23T18:58:24.973Z",
-      "imagemUrl": "https://imgs.search.brave.com/OWGuipvl5GyN0lp7YPVDK70Hx65bx3PBDsxqhx7Ok3s/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9pbWcw/LmljYXJyb3MuY29t/L2RiaW1nL2ltZ2Fk/aWNpb25hbGFudW5j/aW8vMS80NDYxOTYy/MjRfMS5qcGc",
-      "createdAt": "2025-11-23T18:58:24.973Z"
-    },
-    {
-      "id": null,
-      "usuarioId": "5475",
-      "titulo": "gemas",
-      "conteudo": "gemando",
-      "plataforma": "facebook",
-      "status": "publicado",
-      "data": "2025-11-23T19:29:58.686Z",
-      "imagemUrl": "https://imgs.search.brave.com/k1F9bk6kEw3Ab6GbCYZ8B6bxbbGrgkrjd3JqTKyytVA/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9nYW1l/c2NlbnRlci5wZS93/cC1jb250ZW50L3Vw/bG9hZHMvMjAyNC8x/Mi9DbGFzaC1Sb3lh/bGUtMjUwMC1HZW1h/cy53ZWJw",
-      "createdAt": "2025-11-23T19:29:58.686Z",
+      "createdAt": "2025-11-25T02:22:37.820Z",
       "agendadoEm": null
     },
     {
-      "id": "b890",
-      "usuarioId": 5477,
-      "posts": []
+      "id": 2,
+      "usuarioId": 3,
+      "titulo": "clash royale",
+      "conteudo": "carta",
+      "plataforma": "twitter",
+      "status": "publicado",
+      "data": "2025-11-25T02:29:09.419Z",
+      "imagemUrl": "https://imgs.search.brave.com/pLvu2fwqsq7FV2Af7CG3S3fX5KqB4KFGh9O79oWVV-8/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9zdGF0/aWMudmVjdGVlenku/Y29tL3RpL2ZvdG9z/LWdyYXRpcy90Mi83/NzczMDczLWx1eG8t/c3V2LWNhcnJvLWVz/dGFjaW9uYWRvLWVt/LXRlcnJhLWFvLWxh/ZG8tZmxvcmVzdGEt/dHJvcGljYWwtY29t/LWJlbG8tbmFzY2Vy/LWRvLXNvbC1jYXJy/by1ub3ZvLWNvbS1l/c3BvcnRlLWUtZGVz/aWduLW1vZGVybm8t/Y2Fycm8tcGFyYS1h/dmVudHVyYS1yb2Fk/LXRyaXAtbmF0dXJl/emEtcGFpc2FnZW0t/aW5kdXN0cmlhLWF1/dG9tb3RpdmEtZm90/by5qcGc",
+      "createdAt": "2025-11-25T02:29:09.419Z",
+      "agendadoEm": null
     },
     {
-      "id": null,
-      "usuarioId": 5477,
-      "titulo": "BOM PRA CACHORRO",
-      "conteudo": "VENDAS",
+      "id": 3,
+      "usuarioId": 1,
+      "titulo": "aula",
+      "conteudo": "edecio",
       "plataforma": "instagram",
-      "status": "agendado",
-      "data": "2025-11-25T18:00:00",
-      "imagemUrl": "https://imgs.search.brave.com/AEmvPbl-t3sR00__NKyN8UZ7Iu-0fPmV6ZjlEUWYcH4/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/Zm90b3MtZ3JhdGlz/L2NhY2hvcnJvcy1k/ZS1jYWVzLW5vLXZp/ZHJvLWlzb2xhZG8t/bm8tZnVuZG8tYnJh/bmNvXzEyMzItMTY3/Ny5qcGc_c2VtdD1h/aXNfaHlicmlkJnc9/NzQwJnE9ODA",
-      "createdAt": "2025-11-23T20:06:01.183Z",
-      "agendadoEm": "2025-11-23T20:06:01.183Z"
+      "status": "publicado",
+      "data": "2025-11-25T02:36:43.327Z",
+      "imagemUrl": "https://imgs.search.brave.com/fxirzfHgsgvnE40kZTLYsRvsU_mFnp499ar6Doudfnk/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/Lm9yZy93aWtpcGVk/aWEvY29tbW9ucy90/aHVtYi80LzRmL1Nw/YXItWmVuMjAxNV8l/MjgzJTI5LmpwZy81/MTJweC1TcGFyLVpl/bjIwMTVfJTI4MyUy/OS5qcGc",
+      "createdAt": "2025-11-25T02:36:43.327Z",
+      "agendadoEm": null
+    },
+    {
+      "id": 4,
+      "usuarioId": 1,
+      "titulo": "aula",
+      "conteudo": "edecio",
+      "plataforma": "linkedin",
+      "status": "publicado",
+      "data": "2025-11-25T02:36:43.327Z",
+      "imagemUrl": "https://imgs.search.brave.com/fxirzfHgsgvnE40kZTLYsRvsU_mFnp499ar6Doudfnk/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/Lm9yZy93aWtpcGVk/aWEvY29tbW9ucy90/aHVtYi80LzRmL1Nw/YXItWmVuMjAxNV8l/MjgzJTI5LmpwZy81/MTJweC1TcGFyLVpl/bjIwMTVfJTI4MyUy/OS5qcGc",
+      "createdAt": "2025-11-25T02:36:43.327Z",
+      "agendadoEm": null
     }
   ],
-  "estatisticas": [
+  "usuarios": [
     {
-      "id": "1",
-      "usuarioId": "5475",
-      "engajamento": "1.2K",
-      "alcance": "15.7K",
-      "seguidores": 1250,
-      "visualizacoes": 45000,
-      "curtidas": 3200,
-      "comentarios": 150,
-      "compartilhamentos": 89
-    },
-    {
-      "id": "5476",
-      "usuarioId": 5476,
-      "engajamento": "0",
-      "alcance": "0"
+      "id": 1,
+      "nome": "lucca",
+      "email": "lucca@email.com",
+      "senha": "1234",
+      "foto": "",
+      "estatisticas": {
+        "engajamento": "0",
+        "alcance": "0"
+      }
     }
   ]
 }

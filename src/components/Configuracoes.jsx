@@ -64,10 +64,6 @@ const Configuracoes = () => {
         
         <header className="mb-5">
           <div className="flex items-center justify-between px-20">
-            <Link to="/perfil" className="flex items-center text-gray-600 hover:text-gray-900 transition">
-              <AiOutlineArrowLeft className="text-xl mr-2" />
-              <span className="font-medium">Voltar</span>
-            </Link>
             <h1 className="text-3xl font-bold text-gray-900">Configurações</h1>
             <button className="bg-orange-500 text-white px-3 py-1 rounded-lg font-medium hover:bg-orange-600 transition shadow-md whitespace-nowrap text-sm">
               Salvar

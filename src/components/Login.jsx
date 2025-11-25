@@ -1,4 +1,3 @@
-// components/Login.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -16,11 +15,9 @@ export default function Login() {
     const senha = e.target.senha.value;
 
     try {
-      // Buscar todos os usuários
       const res = await fetch('http://localhost:3001/usuarios');
       const todosUsuarios = await res.json();
 
-      // Filtrar manualmente por email e senha
       const usuarioEncontrado = todosUsuarios.find(
         usuario => usuario.email === email && usuario.senha === senha
       );
@@ -31,7 +28,6 @@ export default function Login() {
         return;
       }
 
-      // Salvar usuário no localStorage
       localStorage.setItem("usuarioLogado", JSON.stringify(usuarioEncontrado));
 
       navigate("/dashboard");

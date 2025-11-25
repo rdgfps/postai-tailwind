@@ -22,16 +22,13 @@ const CalendarioPosts = () => {
       let novoAno = indiceAno;
 
       if (novoMes > 11) {
-        // Avançou para o próximo ano
         novoMes = 0;
         novoAno = getProximoAno(novoAno);
       } else if (novoMes < 0) {
-        // Voltou para o ano anterior
         novoMes = 11;
         novoAno = getAnoAnterior(novoAno);
       }
 
-      // Atualiza o ano se necessário
       if (novoAno !== indiceAno) {
         setIndiceAno(novoAno);
       }
@@ -43,7 +40,6 @@ const CalendarioPosts = () => {
   const getProximoAno = (anoAtual) => {
     const anoIndex = anosDisponiveis.indexOf(anoAtual);
     if (anoIndex === -1 || anoIndex === anosDisponiveis.length - 1) {
-      // Se não encontrou o ano ou é o último, volta para o primeiro
       return anosDisponiveis[0];
     }
     return anosDisponiveis[anoIndex + 1];
@@ -52,7 +48,6 @@ const CalendarioPosts = () => {
   const getAnoAnterior = (anoAtual) => {
     const anoIndex = anosDisponiveis.indexOf(anoAtual);
     if (anoIndex === -1 || anoIndex === 0) {
-      // Se não encontrou o ano ou é o primeiro, vai para o último
       return anosDisponiveis[anosDisponiveis.length - 1];
     }
     return anosDisponiveis[anoIndex - 1];
@@ -91,12 +86,10 @@ const CalendarioPosts = () => {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="bg-white rounded-2xl shadow-sm p-10 flex flex-col gap-6">
-          {/* Header */}
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold text-gray-900">Calendário de Posts</h2>
           </div>
 
-          {/* Controles do Calendário */}
           <div className="flex justify-center items-center gap-3">
             <button 
               className="border-none bg-white rounded-lg p-2 cursor-pointer shadow-sm transition-all duration-200 hover:bg-orange-500 hover:text-white"
@@ -133,12 +126,10 @@ const CalendarioPosts = () => {
             </button>
           </div>
 
-          {/* Indicador de anos disponíveis */}
           <div className="text-center text-sm text-gray-600">
             Anos disponíveis: {anosDisponiveis.join(", ")}
           </div>
 
-          {/* Filtros */}
           <div className="flex justify-center gap-2.5 flex-wrap">
             <button className="bg-orange-500 text-white border border-orange-500 rounded-lg py-1.5 px-3 cursor-pointer font-medium transition-all duration-200">
               Todos
@@ -157,7 +148,6 @@ const CalendarioPosts = () => {
             </button>
           </div>
 
-          {/* Grade do Calendário */}
           <div className="grid grid-cols-7 gap-4 bg-white p-6 rounded-xl shadow-sm">
             {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((dia) => (
               <div key={dia} className="text-center font-semibold text-gray-700 text-sm pb-2">
@@ -180,7 +170,6 @@ const CalendarioPosts = () => {
             ))}
           </div>
 
-          {/* Legenda */}
           <div className="bg-white rounded-xl p-5 shadow-sm">
             <h4 className="mb-2.5 text-gray-900 font-semibold">Legenda</h4>
             <div className="flex flex-wrap gap-4 text-sm text-gray-700">

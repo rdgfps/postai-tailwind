@@ -31,10 +31,8 @@ const Layout = ({ children }) => {
 
 function App() {
   React.useEffect(() => {
-    // Verificar posts agendados quando o app iniciar
     postService.verificarEPublicarPostsAgendados();
     
-    // Verificar a cada minuto
     const interval = setInterval(postService.verificarEPublicarPostsAgendados, 60000);
     
     return () => clearInterval(interval);
